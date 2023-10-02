@@ -3,29 +3,96 @@
   <head>
     <base target="_top" />
     <style>
-      /* Styles for the drop-zone element */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+      }
+
+      .container {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
       .drop-zone {
         border: 2px dashed #ccc;
         padding: 20px;
         text-align: center;
         cursor: pointer;
+        margin-bottom: 20px;
+        border-radius: 8px;
       }
 
-      /* Styles for the drop-zone element when a file is being dragged over it */
       .drag-over {
-        background-color: #f0f8ff;
+        background-color: #e0f7fa;
+      }
+
+      button {
+        background-color: #008cba;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+
+      #column-selector {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #ccc;
+        padding: 10px;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        margin-bottom: 20px;
+      }
+
+      .column-filter {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #ccc;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        align-items: center; /* Align items along the y-axis */
+      }
+
+      .filter-group {
+        display: flex;
+        justify-content: space-between; /* Space between the filter name and input field */
+        align-items: center;
+        margin-bottom: 5px;
+        width: 100%; /* Ensures the space-between takes full effect */
+      }
+
+      .filter-label {
+        margin-right: 10px;
+      }
+
+      .filter-input {
+        width: 80px;
+        padding: 5px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
       }
     </style>
   </head>
   <body>
-    <!-- HTML elements for the CSV file upload interface -->
-    <div id="dropZone" class="drop-zone">
-      <p>Drag and drop a CSV file here or click to select one.</p>
-      <input type="file" id="fileInput" accept=".csv" style="display: none" />
+    <div class="container">
+      <div id="dropZone" class="drop-zone">
+        <p>Drag and drop a CSV file here or click to select one.</p>
+        <input type="file" id="fileInput" accept=".csv" style="display: none" />
+      </div>
+      <div id="column-selector"></div>
+      <button onclick="submitColumns()">Submit</button>
     </div>
-    <button onclick="submitColumns()">Submit</button>
-    <div id="column-selector"></div>
-
     <script>
       // Getting the HTML elements for the drop-zone and file input
       var dropZone = document.getElementById("dropZone");
@@ -82,12 +149,22 @@
         reader.readAsText(file);
       }
 
-      // Function to display the columns of the CSV file for selection
       function displayColumns(columns) {
         var columnSelector = document.getElementById("column-selector");
         columnSelector.innerHTML = "";
         for (var i = 0; i < columns.length; i++) {
           var column = columns[i];
+
+          var columnFilter = document.createElement("div");
+          columnFilter.className = "column-filter";
+
+          var selectText = document.createTextNode(
+            "Select this column: "
+          ); /* New text node */
+          columnFilter.appendChild(
+            selectText
+          ); /* Insert text before checkbox */
+
           var checkbox = document.createElement("input");
           checkbox.type = "checkbox";
           checkbox.id = "column" + i;
@@ -95,9 +172,34 @@
           var label = document.createElement("label");
           label.htmlFor = "column" + i;
           label.appendChild(document.createTextNode(column));
-          columnSelector.appendChild(checkbox);
-          columnSelector.appendChild(label);
-          columnSelector.appendChild(document.createElement("br"));
+
+          columnFilter.appendChild(checkbox);
+          columnFilter.appendChild(label);
+
+          [
+            "Lower Bounds",
+            "Upper Bounds",
+            "Exact Values",
+            "Lengths",
+            "Exact Strings",
+          ].forEach((filter) => {
+            var filterGroup = document.createElement("div");
+            filterGroup.className = "filter-group";
+
+            var filterLabel = document.createElement("label");
+            filterLabel.className = "filter-label";
+            filterLabel.appendChild(document.createTextNode(filter));
+
+            var filterInput = document.createElement("input");
+            filterInput.className = "filter-input";
+            filterInput.placeholder = filter;
+
+            filterGroup.appendChild(filterLabel);
+            filterGroup.appendChild(filterInput);
+            columnFilter.appendChild(filterGroup);
+          });
+
+          columnSelector.appendChild(columnFilter);
         }
       }
 
@@ -107,18 +209,37 @@
         var checkboxes = document.querySelectorAll(
           '#column-selector input[type="checkbox"]'
         );
+        var lowerBounds = [];
+        var upperBounds = [];
+        var exactValues = [];
+        var lengths = [];
+        var exactStrings = [];
         for (var i = 0; i < checkboxes.length; i++) {
+          var columnFilter = checkboxes[i].closest(".column-filter");
           if (checkboxes[i].checked) {
             selectedColumns.push(checkboxes[i].value);
+            lowerBounds.push(
+              columnFilter.querySelector('input[placeholder="Lower Bounds"]')
+                .value || -1
+            );
+            upperBounds.push(
+              columnFilter.querySelector('input[placeholder="Upper Bounds"]')
+                .value || -1
+            );
+            exactValues.push(
+              columnFilter.querySelector('input[placeholder="Exact Values"]')
+                .value || -1
+            );
+            lengths.push(
+              columnFilter.querySelector('input[placeholder="Lengths"]')
+                .value || -1
+            );
+            exactStrings.push(
+              columnFilter.querySelector('input[placeholder="Exact Strings"]')
+                .value || -1
+            );
           }
         }
-
-        // Defining the lower bounds, upper bounds, exact values, lengths, and exact strings for each selected column
-        var lowerBounds = selectedColumns.map(() => -1);
-        var upperBounds = selectedColumns.map(() => -1);
-        var exactValues = selectedColumns.map(() => -1);
-        var lengths = selectedColumns.map(() => -1);
-        var exactStrings = selectedColumns.map(() => -1);
 
         // Calling the importSelectedColumns function on the server side
         google.script.run.importSelectedColumns(
