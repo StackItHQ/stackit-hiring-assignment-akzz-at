@@ -18,14 +18,8 @@ function parseCSV(csvData) {
   return headers;
 }
 
-function importSelectedColumns(
-  selectedColumns,
-  csvData,
-  lowerBounds,
-  upperBounds,
-  exactValues,
-  lengths
-) {
+function importSelectedColumns(selectedColumns, csvData, exactStrings) {
+  // Adjust this line to match your updated function signature
   var lines = csvData.split("\n");
   var headers = lines[0].split(",");
   var data = [];
@@ -36,14 +30,10 @@ function importSelectedColumns(
       var index = headers.indexOf(selectedColumns[j]);
       if (index !== -1) {
         var value = values[index];
-        var lowerBound = lowerBounds[j];
-        var upperBound = upperBounds[j];
+        var exactString = exactStrings[j];
 
-        if (
-          (lowerBound != -1 && parseFloat(value) < parseFloat(lowerBound)) ||
-          (upperBound != -1 && parseFloat(value) > parseFloat(upperBound))
-        ) {
-          row.push(""); // If value is out of bounds, push an empty string
+        if (exactString != -1 && value !== exactString) {
+          row.push(""); // If value doesn't match the exact string, push an empty string
         } else {
           row.push(value); // Otherwise, push the actual value
         }
