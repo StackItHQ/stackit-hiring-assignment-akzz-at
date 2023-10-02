@@ -27,7 +27,8 @@ function importSelectedColumns(
   lowerBounds,
   upperBounds,
   exactValues,
-  lengths
+  lengths,
+  exactStrings
 ) {
   var lines = csvData.split("\n");
   var headers = lines[0].split(",");
@@ -48,7 +49,8 @@ function importSelectedColumns(
         if (
           (lowerBound != -1 && parseFloat(value) < parseFloat(lowerBound)) ||
           (upperBound != -1 && parseFloat(value) > parseFloat(upperBound)) ||
-          (exactValue != -1 && value != exactValue) ||
+          // (exactValue != -1 && value != exactValue) ||
+          (exactValue != -1 && parseFloat(value) != parseFloat(exactValue)) ||
           (length != -1 && value.length < length) ||
           (exactString !== -1 && value !== exactString)
         ) {
@@ -62,7 +64,6 @@ function importSelectedColumns(
     }
     data.push(row);
   }
-  // ... rest of your code
 
   const ss = SpreadsheetApp.getActive();
   const sh = ss.getSheetByName("Sheet1");
