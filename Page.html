@@ -1,8 +1,10 @@
 function openDialog() {
-// Create an HTML output object from the file named 'Page',
+// Created an HTML output object from the file named 'Page',
 // and set its dimensions to 400x300 pixels
 var html = HtmlService.createHtmlOutputFromFile('Page')
 .setWidth(400)
 .setHeight(300);
+// Access the user interface of the current spreadsheet and
+// show a modal dialog box with the specified HTML content and title
 SpreadsheetApp.getUi().showModalDialog(html, 'Upload CSV');
 }
