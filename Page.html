@@ -3,18 +3,22 @@
   <head>
     <base target="_top" />
     <style>
+      /* Styles for the drop-zone element */
       .drop-zone {
         border: 2px dashed #ccc;
         padding: 20px;
         text-align: center;
         cursor: pointer;
       }
+
+      /* Styles for the drop-zone element when a file is being dragged over it */
       .drag-over {
         background-color: #f0f8ff;
       }
     </style>
   </head>
   <body>
+    <!-- HTML elements for the CSV file upload interface -->
     <div id="dropZone" class="drop-zone">
       <p>Drag and drop a CSV file here or click to select one.</p>
       <input type="file" id="fileInput" accept=".csv" style="display: none" />
