@@ -22,63 +22,32 @@
     </div>
     <button onclick="submitColumns()">Submit</button>
     <div id="column-selector"></div>
-
+    <br />
+    <label for="minLengthFilter">Minimum Length Filter: </label>
+    <input type="number" id="minLengthFilter" value="0" min="0" />
     <script>
       var dropZone = document.getElementById("dropZone");
       var fileInput = document.getElementById("fileInput");
       var uploadedData = null;
 
-      dropZone.addEventListener("dragover", function (e) {
-        e.preventDefault();
-        dropZone.classList.add("drag-over");
-      });
-
-      dropZone.addEventListener("dragleave", function () {
-        dropZone.classList.remove("drag-over");
-      });
-
-      dropZone.addEventListener("drop", function (e) {
-        e.preventDefault();
-        dropZone.classList.remove("drag-over");
-
-        var files = e.dataTransfer.files;
-        if (files.length === 1 && files[0].name.endsWith(".csv")) {
-          handleFile(files[0]);
-        } else {
-          alert("Please drop a single CSV file.");
+      function submitColumns() {
+        var selectedColumns = [];
+        var minLengthFilter = [];
+        var checkboxes = document
+          .getElementById("column-selector")
+          .getElementsByTagName("input");
+        var minLengthValue = document.getElementById("minLengthFilter").value; // Get the minimum length filter value
+        for (var i = 0; i < checkboxes.length; i++) {
+          if (checkboxes[i].checked) {
+            selectedColumns.push(checkboxes[i].value);
+            minLengthFilter.push(minLengthValue); // Use the same minimum length filter value for all selected columns
+          }
         }
-      });
-
-      dropZone.addEventListener("click", function () {
-        fileInput.click();
-      });
-      fileInput.addEventListener("change", function () {
-        var file = fileInput.files[0];
-        if (file && file.name.endsWith(".csv")) {
-          handleFile(file);
-        } else {
-          alert("Please select a CSV file.");
-        }
-      });
-
-      function showColumns(columns) {
-        var columnSelector = document.getElementById("column-selector");
-        columnSelector.innerHTML = "";
-        columns.forEach(function (column, index) {
-          var checkbox = document.createElement("input");
-          checkbox.type = "checkbox";
-          checkbox.id = "column-" + index;
-          checkbox.value = column;
-          checkbox.checked = true;
-
-          var label = document.createElement("label");
-          label.htmlFor = "column-" + index;
-          label.textContent = column;
-
-          columnSelector.appendChild(checkbox);
-          columnSelector.appendChild(label);
-          columnSelector.appendChild(document.createElement("br"));
-        });
+        google.script.run.importSelectedColumns(
+          selectedColumns,
+          minLengthFilter,
+          uploadedData
+        );
       }
     </script>
   </body>
