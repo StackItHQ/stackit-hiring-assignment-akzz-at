@@ -60,6 +60,32 @@ Feel free to check the discussions tab, you might get something of help there. C
 # Developer's Section
 *https://drive.google.com/file/d/120KD8GaDDnEDtrI-WPGConh9_jADzYfv/view?usp=sharing*
 
+## Prerequisites
+
+- A Google account.
+- Access to Google Sheets.
+- Basic knowledge of Google Apps Script, HTML, and JavaScript.
+
+## Installation
+
+1. **Download the HTML and JavaScript files:**
+   - Download the HTML and JavaScript files provided in the original project repository.
+
+2. **Open Google Sheets:**
+   - Create a new Google Sheets document or open an existing one.
+
+3. **Access the Script Editor:**
+   - From the menu, select `Extensions` → `Apps Script`.
+
+4. **Create New Files:**
+   - In the script editor, click on the "+" icon to add a new file.
+   - Create an HTML file, name it (e.g., `Page.html`), and copy the content of the downloaded HTML file into it.
+   - If there are JavaScript files in the original project, create new `.gs` files for each and copy the content from the respective JavaScript files.
+
+5. **Save the Project:**
+   - Click on the disk icon to save the project.
+   - Provide a name for your project and click "OK".
+
 ### Approach to Problem Solving:
 The delineated method exhibits a structured approach towards crafting a CSV Importer tool for Google Sheets. Here's a step-by-step breakdown of the procedure implemented:
 
