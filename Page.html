@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <style>
+        .drop-zone {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .drag-over {
+            background-color: #f0f8ff;
+        }
+    </style>
+</head>
+<body>
+<div id="dropZone" class="drop-zone">
+    <p>Drag and drop a CSV file here or click to select one.</p>
+    <input type="file" id="fileInput" accept=".csv" style="display: none;">
+</div>
+<button onclick="submitColumns()">Submit</button>
+<div id="column-selector"></div>
+
+<script>
+    var dropZone = document.getElementById('dropZone');
+    var fileInput = document.getElementById('fileInput');
+    var uploadedData = null;
+
+    dropZone.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        dropZone.classList.add('drag-over');
+    });
+
+    dropZone.addEventListener('dragleave', function () {
+        dropZone.classList.remove('drag-over');
+    });
+
+    dropZone.addEventListener('drop', function (e) {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+
+        var files = e.dataTransfer.files;
+        if (files.length === 1 && files[0].name.endsWith('.csv')) {
+            handleFile(files[0]);
+        } else {
+            alert('Please drop a single CSV file.');
+        }
+    });
+
+    dropZone.addEventListener('click', function () {
+        fileInput.click();
+    });
+    fileInput.addEventListener('change', function () {
+        var file = fileInput.files[0];
+        if (file && file.name.endsWith('.csv')) {
+            handleFile(file);
+        } else {
+            alert('Please select a CSV file.');
+        }
+    });
