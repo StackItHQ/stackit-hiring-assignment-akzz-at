@@ -1,5 +1,5 @@
 function openDialog() {
-  // Created an HTML output object from the file named 'Page',
+  // Create an HTML output object from the file named 'Page',
   // and set its dimensions to 400x300 pixels
   var html = HtmlService.createHtmlOutputFromFile("Page")
     .setWidth(400)
@@ -9,6 +9,7 @@ function openDialog() {
   SpreadsheetApp.getUi().showModalDialog(html, "Upload CSV");
 }
 
+// Define the function parseCSV to extract the header row from the CSV data
 function parseCSV(csvData) {
   // Split the CSV data into lines based on newline characters
   var lines = csvData.split("\n");
@@ -18,8 +19,16 @@ function parseCSV(csvData) {
   return headers;
 }
 
-function importSelectedColumns(selectedColumns, csvData, exactStrings) {
-  // Adjust this line to match your updated function signature
+// Define the function importSelectedColumns to import selected columns from the CSV data
+
+function importSelectedColumns(
+  selectedColumns,
+  csvData,
+  lowerBounds,
+  upperBounds,
+  exactValues,
+  lengths
+) {
   var lines = csvData.split("\n");
   var headers = lines[0].split(",");
   var data = [];
@@ -30,10 +39,20 @@ function importSelectedColumns(selectedColumns, csvData, exactStrings) {
       var index = headers.indexOf(selectedColumns[j]);
       if (index !== -1) {
         var value = values[index];
+        var lowerBound = lowerBounds[j];
+        var upperBound = upperBounds[j];
+        var exactValue = exactValues[j];
+        var length = lengths[j];
         var exactString = exactStrings[j];
 
-        if (exactString != -1 && value !== exactString) {
-          row.push(""); // If value doesn't match the exact string, push an empty string
+        if (
+          (lowerBound != -1 && parseFloat(value) < parseFloat(lowerBound)) ||
+          (upperBound != -1 && parseFloat(value) > parseFloat(upperBound)) ||
+          (exactValue != -1 && value != exactValue) ||
+          (length != -1 && value.length < length) ||
+          (exactString !== -1 && value !== exactString)
+        ) {
+          row.push(""); // If value doesn't meet the criteria, push an empty string
         } else {
           row.push(value); // Otherwise, push the actual value
         }
@@ -43,6 +62,7 @@ function importSelectedColumns(selectedColumns, csvData, exactStrings) {
     }
     data.push(row);
   }
+  // ... rest of your code
 
   const ss = SpreadsheetApp.getActive();
   const sh = ss.getSheetByName("Sheet1");
@@ -50,13 +70,13 @@ function importSelectedColumns(selectedColumns, csvData, exactStrings) {
 
   var startRow;
   if (lrow === 0) {
-    // Check if the sheet is blank
     startRow = 1;
   } else {
     const Avals = sh.getRange("A1:A" + lrow).getValues();
     const foundIndex = Avals.findIndex((row) => row[0] === "");
     startRow = (foundIndex !== -1 ? foundIndex : lrow) + 1;
   }
-  data.unshift(selectedColumns); // Add column names as header row
+
+  data.unshift(selectedColumns);
   sh.getRange(startRow, 1, data.length, data[0].length).setValues(data);
 }
