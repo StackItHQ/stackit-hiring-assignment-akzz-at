@@ -9,7 +9,6 @@
         text-align: center;
         cursor: pointer;
       }
-
       .drag-over {
         background-color: #f0f8ff;
       }
@@ -22,31 +21,110 @@
     </div>
     <button onclick="submitColumns()">Submit</button>
     <div id="column-selector"></div>
-    <br />
-    <label for="minLengthFilter">Minimum Length Filter: </label>
-    <input type="number" id="minLengthFilter" value="0" min="0" />
+
     <script>
+      // Getting the HTML elements for the drop-zone and file input
       var dropZone = document.getElementById("dropZone");
       var fileInput = document.getElementById("fileInput");
       var uploadedData = null;
 
+      // Adding event listeners for drag and drop file upload functionality
+      dropZone.addEventListener("dragover", function (e) {
+        e.preventDefault();
+        dropZone.classList.add("drag-over");
+      });
+
+      dropZone.addEventListener("dragleave", function () {
+        dropZone.classList.remove("drag-over");
+      });
+
+      dropZone.addEventListener("drop", function (e) {
+        e.preventDefault();
+        dropZone.classList.remove("drag-over");
+
+        var files = e.dataTransfer.files;
+        if (files.length === 1 && files[0].name.endsWith(".csv")) {
+          handleFile(files[0]);
+        } else {
+          alert("Please drop a single CSV file.");
+        }
+      });
+
+      // Adding an event listener for click-to-upload functionality
+      dropZone.addEventListener("click", function () {
+        fileInput.click();
+      });
+
+      // Adding an event listener for file selection functionality
+      fileInput.addEventListener("change", function () {
+        var file = fileInput.files[0];
+        if (file && file.name.endsWith(".csv")) {
+          handleFile(file);
+        } else {
+          alert("Please select a CSV file.");
+        }
+      });
+
+      // Function to handle file upload and read the CSV file
+      function handleFile(file) {
+        var reader = new FileReader();
+        reader.onload = function (event) {
+          uploadedData = event.target.result;
+          dropZone.innerHTML = "<p>File uploaded: " + file.name + "</p>";
+          google.script.run
+            .withSuccessHandler(displayColumns)
+            .parseCSV(uploadedData);
+        };
+        reader.readAsText(file);
+      }
+
+      // Function to display the columns of the CSV file for selection
+      function displayColumns(columns) {
+        var columnSelector = document.getElementById("column-selector");
+        columnSelector.innerHTML = "";
+        for (var i = 0; i < columns.length; i++) {
+          var column = columns[i];
+          var checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.id = "column" + i;
+          checkbox.value = column;
+          var label = document.createElement("label");
+          label.htmlFor = "column" + i;
+          label.appendChild(document.createTextNode(column));
+          columnSelector.appendChild(checkbox);
+          columnSelector.appendChild(label);
+          columnSelector.appendChild(document.createElement("br"));
+        }
+      }
+
+      // Function to submit the selected columns for import
       function submitColumns() {
         var selectedColumns = [];
-        var minLengthFilter = [];
-        var checkboxes = document
-          .getElementById("column-selector")
-          .getElementsByTagName("input");
-        var minLengthValue = document.getElementById("minLengthFilter").value; // Get the minimum length filter value
+        var checkboxes = document.querySelectorAll(
+          '#column-selector input[type="checkbox"]'
+        );
         for (var i = 0; i < checkboxes.length; i++) {
           if (checkboxes[i].checked) {
             selectedColumns.push(checkboxes[i].value);
-            minLengthFilter.push(minLengthValue); // Use the same minimum length filter value for all selected columns
           }
         }
+
+        // Defining the lower bounds, upper bounds, exact values, lengths, and exact strings for each selected column
+        var lowerBounds = selectedColumns.map(() => -1);
+        var upperBounds = selectedColumns.map(() => -1);
+        var exactValues = selectedColumns.map(() => -1);
+        var lengths = selectedColumns.map(() => -1);
+        var exactStrings = selectedColumns.map(() => -1);
+
+        // Calling the importSelectedColumns function on the server side
         google.script.run.importSelectedColumns(
           selectedColumns,
-          minLengthFilter,
-          uploadedData
+          uploadedData,
+          lowerBounds,
+          upperBounds,
+          exactValues,
+          lengths,
+          exactStrings
         );
       }
     </script>
