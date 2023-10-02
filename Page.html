@@ -10,6 +10,8 @@ SpreadsheetApp.getUi().showModalDialog(html, 'Upload CSV');
 }
 
 function parseCSV(csvData) {
+// Split the CSV data into lines based on newline characters
+var lines = csvData.split('\n');
 // Split the first line of the CSV data into an array of headers based on commas
 var headers = lines[0].split(',');
 // Return the array of headers
