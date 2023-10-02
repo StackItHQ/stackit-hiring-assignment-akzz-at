@@ -35,7 +35,6 @@ function importSelectedColumns(selectedColumns, csvData) {
     }
     data.push(row);
   }
-}
 
 
 const ss = SpreadsheetApp.getActive();
@@ -50,3 +49,6 @@ const ss = SpreadsheetApp.getActive();
         const foundIndex = Avals.findIndex(row => row[0] === '');
         startRow = (foundIndex !== -1 ? foundIndex : lrow) + 1;
     }
+    data.unshift(selectedColumns);  // Add column names as header row
+    sh.getRange(startRow, 1, data.length, data[0].length).setValues(data);  // Use `sh` instead of getting the active sheet again
+}
