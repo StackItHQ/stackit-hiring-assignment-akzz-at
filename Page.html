@@ -1,0 +1,8 @@
+function openDialog() {
+// Create an HTML output object from the file named 'Page',
+// and set its dimensions to 400x300 pixels
+var html = HtmlService.createHtmlOutputFromFile('Page')
+.setWidth(400)
+.setHeight(300);
+SpreadsheetApp.getUi().showModalDialog(html, 'Upload CSV');
+}
