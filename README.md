@@ -57,5 +57,50 @@ We have a checklist at the bottom of this README file, which you should update a
 ## Got Questions❓
 Feel free to check the discussions tab, you might get something of help there. Check out that tab before reaching out to us. Also, did you know, the internet is a great place to explore 😛
 
-## Developer's Section
+# Developer's Section
 *Add your video here, and your approach to the problem (optional). Leave some comments for us here if you want, we will be reading this :)*
+
+### Approach to Problem Solving:
+The delineated method exhibits a structured approach towards crafting a CSV Importer tool for Google Sheets. Here's a step-by-step breakdown of the procedure implemented:
+
+1. **Dialog Box Initiation**:
+   - The `openDialog` function is triggered, rendering a modal dialog box where users can either drag-and-drop or manually select a CSV file.
+   
+2. **CSV Parsing and Header Extraction**:
+   - Post file selection, `parseCSV` function is invoked to extract headers from the CSV data, which are subsequently displayed with checkboxes for users to selectively import columns, accompanied by input fields for specifying filtering criteria.
+   
+3. **Column Selection and Criteria Specification**:
+   - Upon submission, `submitColumns` function aggregates the selected columns and filtering criteria, channeling them to `importSelectedColumns` function.
+   
+4. **Data Filtering**:
+   - A thorough iteration through the CSV data is performed, evaluating each entry against the specified criteria for data filtration. Additionally, a meticulous check for any absent columns in a row is conducted to uphold the data structure's integrity.
+   
+5. **Data Transcription to Google Sheet**:
+   - The filtered data is then transcribed to a Google Sheet, commencing from either an empty or specified row, determined by inspecting the last populated row in the Sheet. The setup allows appending the refined data to an existing Sheet or inscribing on a new Sheet, maintaining a balance between automation and user control. 
+
+
+### Corner Cases Handled 
+
+1. **Empty CSV File**
+If an empty CSV file is uploaded, the `importSelectedColumns` function will not add any data to the sheet, but it will still attempt to run without errors. The loop `for (var i = 1; i < lines.length; i++)` will not iterate and data will remain an empty array.
+
+2.  **Missing Headers**
+If the CSV file lacks headers, `parseCSV` would still attempt to split the first line into headers. This would result in inaccurate column mapping in `importSelectedColumns` when processing subsequent rows. There isn’t a direct check for this scenario in the code.
+
+3.  **Mismatched Column Count**
+In the `importSelectedColumns` function, if a row has more or fewer columns than the header row, this code handles it by checking the index of each selected column in the header row with `var index = headers.indexOf(selectedColumns[j]);` If a column is missing (indicated by an index of -1), an empty string is pushed to the row array.
+
+4. **Filtering Criteria**
+In `importSelectedColumns`, a variety of filtering criteria are applied to each data value, such as checking against lower and upper bounds, exact values, string lengths, and exact strings. If a data value fails any of these criteria, an empty string is added to the row array instead of the actual value.
+
+
+### Identified Drawbacks:
+
+- **Endpoint Detection Issue**:
+  - The mechanism to ascertain the endpoint of an already populated sheet encounters a hiccup if the first column is empty. The current logic, dependent on examining the first column to locate the last populated row, could misidentify the starting point for appending new data if the first column lacks entries.
+  
+- **Performance Degradation with Large Files**:
+  - The code's efficiency dwindles when processing very large files, attributable chiefly to the inherent limitations of Google Apps Script. The algorithm, being wholly devised from scratch without utilizing external APIs or optimized libraries, encounters further performance impediments when handling hefty datasets. This scenario could lead to a sluggish user experience or timeouts, which could have been alleviated by leveraging external APIs or optimized libraries tailored for managing large CSV files, thereby ensuring a swifter, more responsive user interaction.
+
+*Feel free to refer to the inline comments within the code for a more detailed understanding of the logic and the approach taken to address various segments of the problem statement.*
+
