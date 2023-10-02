@@ -36,19 +36,19 @@ function importSelectedColumns(selectedColumns, csvData) {
     data.push(row);
   }
 
+  const ss = SpreadsheetApp.getActive();
+  const sh = ss.getSheetByName("Sheet1");
+  const lrow = sh.getLastRow();
 
-const ss = SpreadsheetApp.getActive();
-    const sh = ss.getSheetByName('Sheet1');
-    const lrow = sh.getLastRow();
-
-    var startRow;
-    if (lrow === 0) {  // Check if the sheet is blank
-        startRow = 1;
-    } else {
-        const Avals = sh.getRange("A1:A" + lrow).getValues();
-        const foundIndex = Avals.findIndex(row => row[0] === '');
-        startRow = (foundIndex !== -1 ? foundIndex : lrow) + 1;
-    }
-    data.unshift(selectedColumns);  // Add column names as header row
-    sh.getRange(startRow, 1, data.length, data[0].length).setValues(data);  // Use `sh` instead of getting the active sheet again
+  var startRow;
+  if (lrow === 0) {
+    // Check if the sheet is blank
+    startRow = 1;
+  } else {
+    const Avals = sh.getRange("A1:A" + lrow).getValues();
+    const foundIndex = Avals.findIndex((row) => row[0] === "");
+    startRow = (foundIndex !== -1 ? foundIndex : lrow) + 1;
+  }
+  data.unshift(selectedColumns); // Add column names as header row
+  sh.getRange(startRow, 1, data.length, data[0].length).setValues(data);
 }
