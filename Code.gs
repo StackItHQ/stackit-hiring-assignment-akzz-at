@@ -18,7 +18,14 @@ function parseCSV(csvData) {
   return headers;
 }
 
-function importSelectedColumns(selectedColumns, csvData) {
+function importSelectedColumns(
+  selectedColumns,
+  csvData,
+  lowerBounds,
+  upperBounds,
+  exactValues,
+  lengths
+) {
   var lines = csvData.split("\n");
   var headers = lines[0].split(",");
   var data = [];
@@ -28,7 +35,18 @@ function importSelectedColumns(selectedColumns, csvData) {
     for (var j = 0; j < selectedColumns.length; j++) {
       var index = headers.indexOf(selectedColumns[j]);
       if (index !== -1) {
-        row.push(values[index]);
+        var value = values[index];
+        var lowerBound = lowerBounds[j];
+        var upperBound = upperBounds[j];
+
+        if (
+          (lowerBound != -1 && parseFloat(value) < parseFloat(lowerBound)) ||
+          (upperBound != -1 && parseFloat(value) > parseFloat(upperBound))
+        ) {
+          row.push(""); // If value is out of bounds, push an empty string
+        } else {
+          row.push(value); // Otherwise, push the actual value
+        }
       } else {
         row.push("");
       }
