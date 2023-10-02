@@ -8,3 +8,10 @@ var html = HtmlService.createHtmlOutputFromFile('Page')
 // show a modal dialog box with the specified HTML content and title
 SpreadsheetApp.getUi().showModalDialog(html, 'Upload CSV');
 }
+
+function parseCSV(csvData) {
+// Split the first line of the CSV data into an array of headers based on commas
+var headers = lines[0].split(',');
+// Return the array of headers
+return headers;
+}
